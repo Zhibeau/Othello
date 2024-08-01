@@ -101,27 +101,32 @@ public class Game {
     }
 
     private void play() throws IlegalMoveException{
-        boolean done = false;
+        boolean done;
         while (!board.isGameOver(player1,player2)) {
+            done = false;
+            try {
+                board.displayBoard();
+                offerPlayerOptions(); 
+            } catch (IlegalMoveException e) {
+                System.out.println("Invalid move. Retake your move.");
                 while (!done){
-                    try {
-                        offerPlayerOptions(); 
-                        done = true;
-                    } catch (IlegalMoveException e1) {
+                    try{
                         makeMove();
+                    } catch (IlegalMoveException e1){
+                        System.out.println("Invalid move. Retake your move.");
                     }
-                }
-                switchPlayer(); // Switch turns
+            }
+            switchPlayer(); // Switch turns
         }
         announceWinner();
+        }
     }
 
     private void offerPlayerOptions() throws IlegalMoveException{
-        System.out.println("Choose an option:");
+        System.out.println(currentPlayer.getName()+", please choose an option:");
         System.out.println("1. Make a move");
         System.out.println("2. Save game");
         System.out.println("3. Concede game");
-
         switch (getInputChoice()) {
             case 1:
                 makeMove();
@@ -145,7 +150,6 @@ public class Game {
         int y = scanner.nextInt();
 
         if (!board.isLegalMove(currentPlayer.getPiece(), x, y)) {
-            System.out.println("Invalid move. No pieces to flip.");
             throw new IlegalMoveException();
         }
         board.updateBoard(currentPlayer.getPiece(), x, y);
@@ -162,7 +166,7 @@ public class Game {
         System.out.println("It is now " + currentPlayer.getName() + "'s turn.");
     }
 
-    private void saveGame() {
+    private void saveGame() throws IlegalMoveException{
         System.out.println("Enter filename to save:");
         String filename = scanner.nextLine();
         try (PrintWriter writer = new PrintWriter(filename)) {
@@ -174,12 +178,14 @@ public class Game {
         } catch (IOException e) {
             System.out.println("Failed to save game: " + e.getMessage());
         }
+        start();
     }
 
-    private void concede() {
+    private void concede() throws IlegalMoveException{
         System.out.println(currentPlayer.getName() + " has conceded the game.");
         switchPlayer();
         announceWinner();
+        start();
     }
 
     private void announceWinner() {
