@@ -111,15 +111,17 @@ public class Game {
                 System.out.println("Invalid move. Retake your move.");
                 while (!done){
                     try{
+                        board.displayBoard();
                         makeMove();
                     } catch (IlegalMoveException e1){
                         System.out.println("Invalid move. Retake your move.");
                     }
+                }
+            } finally {
+              switchPlayer(); // Switch turns
             }
-            switchPlayer(); // Switch turns
         }
         announceWinner();
-        }
     }
 
     private void offerPlayerOptions() throws IlegalMoveException{
